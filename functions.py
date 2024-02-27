@@ -39,3 +39,61 @@ def get_html_results():
 
         return compiled_df
 
+def get_daily_series(symbol, API_KEY):
+
+    # Import needed modules
+    import requests
+    import pandas as pd
+
+    # Pull the information
+    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={API_KEY}'
+    data = requests.get(url).json()
+
+    # Format and make into DataFrame
+    data_df = pd.DataFrame(data['Time Series (5min)']).T
+    stock_df = data_df.apply(pd.to_numeric, errors='ignore')
+    stock_df = stock_df.rename(columns={'1. open':'Open', '2. high':'High', 
+                        '3. low': 'Low','4. close':'Close','5. volume':'Volume'})
+    stock_df.index = pd.to_datetime(stock_df.index)
+
+    # Create daily information
+    daily_stock_df = stock_df.groupby(pd.Grouper(freq='D')).agg({
+        'Open': 'first',
+        'High': 'max',
+        'Low': 'min',
+        'Close': 'last',
+        'Volume': 'sum'
+    })
+
+    try:
+        # Save the information to an excel file in separate sheets
+        # MUST pip install xlsxwriter if not already installed
+        writer = pd.ExcelWriter(f'resources/stocks_etfs/{symbol}.xlsx', engine='xlsxwriter')
+        stock_df.to_excel(writer, sheet_name='Interval', index=True, header=True)
+        daily_stock_df.to_excel(writer, sheet_name='Daily', index=True, header=True)
+        writer.close()
+    except:
+        print(f"Could not save {symbol}.")
+
+    # Return DataFrame
+    return stock_df, daily_stock_df
+
+def get_stock_etf_listings(budget):
+    
+    import pandas as pd
+
+    # Import file of stock listings
+    df = pd.read_excel("resources/listing_info.xlsx")
+    df = df.fillna(0)
+
+    # Make columns float
+    df = df.astype({"volume.std":float, 
+                    "volume":float,
+                    "last open":float,
+                    "last close": float,
+                    "H/L Delta": float,
+                    "trending %": float})
+
+    # Keep only those under budget only Stock removing ETF
+    df = df.loc[(df['last close'] <= budget) & (df['assetType'] == "Stock")]
+    return df
