@@ -41,6 +41,14 @@ def get_html_results():
 
 def get_daily_series(symbol, API_KEY):
 
+    """
+    This function calls 5 minute interval time series data from a stock of choice.
+    A symbol and an API_KEY is required.  It can be a free version but remember
+    the limitations of calls per day.  After it gathers and formats the data,
+    the data is grouped into daily totals as a daily_stock_df DataFrame.  Both
+    are saved to an excel file of the symbol name with Daily information placed
+    into 'daily' worksheet and '5 min interval' into 'interval' worksheet
+    """
     # Import needed modules
     import requests
     import pandas as pd
@@ -96,4 +104,35 @@ def get_stock_etf_listings(budget):
 
     # Keep only those under budget only Stock removing ETF
     df = df.loc[(df['last close'] <= budget) & (df['assetType'] == "Stock")]
+    return df
+
+def get_market_listings(API_KEY):
+    
+    # Import needed modules
+    import requests
+    import pandas as pd
+    import csv
+    
+    # Pull the information
+    CSV_URL = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={API_KEY}'
+
+    with requests.Session() as s:
+        download = s.get(CSV_URL)
+        decoded_content = download.content.decode('utf-8')
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        my_list = list(cr)
+
+    # Format and make into DataFrame
+    df = pd.DataFrame(my_list[1:], columns=my_list[0])
+    
+    # Add columns for calculations
+    add_col = ['volume.std', 
+               'volume', 
+               'last open',
+               'last close',
+               'H/L Delta',
+               'trending %']
+    df[add_col] = ''
+
+    # Return DataFrame
     return df
