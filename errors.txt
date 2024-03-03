@@ -1,0 +1,2 @@
+(get_daily_series) Error with symbol NVDA: 2024-03-03 13:53:44
+(get_daily_series) Error with symbol NVDA: 2024-03-03 13:55:21
