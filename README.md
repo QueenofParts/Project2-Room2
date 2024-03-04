@@ -346,3 +346,5 @@ On the day of your presentation, each member of your group is required to submit
 Note: Projects are requirements for graduation. While you are allowed to miss up to two Challenge assignments and still earn your certificate, projects cannot be skipped.
 
 
+References
+OpenAI. (2024). ChatGPT (3.5 version) [Large language model]. https://chat.openai.com/chat
