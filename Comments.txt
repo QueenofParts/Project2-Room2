@@ -1,0 +1,31 @@
+results_profit = compiled_df.groupby("Item").agg({"Profit":"sum"})
+results_strikerate = compiled_df.groupby("Item")["Profit"].apply(lambda x: (x>0).mean())
+
+# Get the average wins and loss
+avg_win = compiled_df.loc[compiled_df['Profit'] > 0].groupby("Item").agg({"Profit":"mean"})
+avg_loss = compiled_df.loc[compiled_df['Profit'] < 0].groupby("Item").agg({"Profit":"mean"})
+
+# Merge the data
+results = pd.merge(results_profit, results_strikerate, on="Item")
+results = results.rename(columns={"Profit_x":"Profits","Profit_y":"Strikerate"})
+results = pd.merge(results, avg_win, on="Item")
+results = pd.merge(results, avg_loss, on="Item")
+results = results.rename(columns={"Profit_x":"Average Win","Profit_y":"Average Loss"})
+
+results
+
+
+to this
+
+results = (
+    compiled_df.groupby("Item").agg(
+                                Profit=("Profit", "sum"),
+                                # Calculate the number of wins to the number of trades
+                                Strikerate=("Profit", lambda x: (x > 0).mean()),
+                                # Use boolean mask [] to filter out true statements
+                                # Calculate the mean of only greater than 0
+                                AverageWin=("Profit", lambda x: x[x > 0].mean()),
+                                # Calculate the mean of only less than 0
+                                AverageLoss=("Profit", lambda x: x[x < 0].mean()),
+    )
+)
