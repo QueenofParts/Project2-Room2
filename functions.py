@@ -1,94 +1,39 @@
-"""
-This file houses all functions used within this project.
-"""
+import pandas as pd
+from dotenv import load_dotenv
+import os, time, requests, csv
+from datetime import datetime
+import numpy as np
+from prophet import Prophet
 
-def get_html_results():
-
-    """
-    The exported files used to analyze are in html format.  This function uses
-    os.listdir() to pull in a list of files within resources/html folder. It
-    then loops through the list of files, reading in each one with minor formatting
-    then concats it to a DataFrame holder to return.
-    """
-    import pandas as pd
-    import os
+def get_market_listings(API_KEY):
     
-    # Create list of html files in the html folder: Does not weed out non-html
-    html_pages = os.listdir("resources/html")
-
-    # Create DataFrame to concat to
-    compiled_df = pd.DataFrame()
-
-    # Loop through html_pages list to pull in
-    for page in html_pages:
-
-        # Read in the file using pandas
-        # Render the 3rd row as data header skipping the first two rows
-        df = pd.read_html(f"resources/html/{page}", header=2)
-
-        # Pull the first Table which is the only table in the html page
-        data_df = pd.DataFrame(df[0])
-
-        # Convert Ticket to numeric and coerce the rest to NaN
-        data_df['Ticket'] = pd.to_numeric(data_df['Ticket'], errors="coerce")
-
-        # Keep only that of Ticket and Size that is not null
-        # This keeps trade data then removes the first row of balance
-        data_df = data_df[(pd.notnull(data_df['Ticket'])) & (pd.notnull(data_df['Size']))]
-        compiled_df = pd.concat([compiled_df, data_df], axis="rows")
-
-        return compiled_df
-
-def get_daily_series(symbol, API_KEY):
-
-    """
-    This function calls 5 minute interval time series data from a stock of choice.
-    A symbol and an API_KEY is required.  It can be a free version but remember
-    the limitations of calls per day.  After it gathers and formats the data,
-    the data is grouped into daily totals as a daily_stock_df DataFrame.  Both
-    are saved to an excel file of the symbol name with Daily information placed
-    into 'daily' worksheet and '5 min interval' into 'interval' worksheet
-    """
-    # Import needed modules
-    import requests
-    import pandas as pd
-
     # Pull the information
-    url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={API_KEY}'
-    data = requests.get(url).json()
+    CSV_URL = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={API_KEY}'
+
+    with requests.Session() as s:
+        download = s.get(CSV_URL)
+        decoded_content = download.content.decode('utf-8')
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        my_list = list(cr)
 
     # Format and make into DataFrame
-    data_df = pd.DataFrame(data['Time Series (5min)']).T
-    stock_df = data_df.apply(pd.to_numeric, errors='ignore')
-    stock_df = stock_df.rename(columns={'1. open':'Open', '2. high':'High', 
-                        '3. low': 'Low','4. close':'Close','5. volume':'Volume'})
-    stock_df.index = pd.to_datetime(stock_df.index)
+    # my_list[1:] calls all from list except first item since it is a header
+    # columns = my_list[0] designates column headers being the first item
+    df = pd.DataFrame(my_list[1:], columns=my_list[0])
+    
+    # Add columns for calculations
+    add_col = ['volume.std', 'volume', 'last open', 'last close', 'H/L Delta',
+               'trending %']
+    df[add_col] = 0
 
-    # Create daily information
-    daily_stock_df = stock_df.groupby(pd.Grouper(freq='D')).agg({
-        'Open': 'first',
-        'High': 'max',
-        'Low': 'min',
-        'Close': 'last',
-        'Volume': 'sum'
-    })
-
-    try:
-        # Save the information to an excel file in separate sheets
-        # MUST pip install xlsxwriter if not already installed
-        writer = pd.ExcelWriter(f'resources/stocks_etfs/{symbol}.xlsx', engine='xlsxwriter')
-        stock_df.to_excel(writer, sheet_name='Interval', index=True, header=True)
-        daily_stock_df.to_excel(writer, sheet_name='Daily', index=True, header=True)
-        writer.close()
-    except:
-        print(f"Could not save {symbol}.")
+    writer = pd.ExcelWriter('resources/listing_info.xlsx', engine='xlsxwriter')
+    df.to_excel(writer, sheet_name="Stock Listings", index=False, header=True)
+    writer.close()
 
     # Return DataFrame
-    return stock_df, daily_stock_df
+    return df
 
-def get_stock_etf_listings(budget):
-    
-    import pandas as pd
+def get_listings():
 
     # Import file of stock listings
     df = pd.read_excel("resources/listing_info.xlsx")
@@ -103,36 +48,126 @@ def get_stock_etf_listings(budget):
                     "trending %": float})
 
     # Keep only those under budget only Stock removing ETF
-    df = df.loc[(df['last close'] <= budget) & (df['assetType'] == "Stock")]
+    df = df.loc[df['status'] == "Active"]
+
     return df
 
-def get_market_listings(API_KEY):
-    
-    # Import needed modules
-    import requests
-    import pandas as pd
-    import csv
-    
-    # Pull the information
-    CSV_URL = f'https://www.alphavantage.co/query?function=LISTING_STATUS&apikey={API_KEY}'
+def get_company_overview(symbol_list, API_KEY):
+    # Set up DataFrame
+    company_info = pd.DataFrame()
+    for i, symbol in enumerate(symbol_list, start=0):
+        try:
+            overview_url = f'https://www.alphavantage.co/query?function=OVERVIEW&symbol={symbol}&apikey={API_KEY}'
+            overview = requests.get(overview_url).json()
+            overview = pd.DataFrame(overview, index=[0])
+            company_info = pd.concat([company_info, overview], axis="rows")
+        except:
+            #print(f"Error with {symbol}")
+            # Append error message
+            process_message = f'(get_company_overview) Error with symbol {symbol}: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n'
+            f = open("errors.txt", "a")
+            f.write(process_message)
+            f.close()
 
-    with requests.Session() as s:
-        download = s.get(CSV_URL)
-        decoded_content = download.content.decode('utf-8')
-        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
-        my_list = list(cr)
-
-    # Format and make into DataFrame
-    df = pd.DataFrame(my_list[1:], columns=my_list[0])
+        # Take an API break 30 API calls per minute
+        if i % 29 == 0 and i != 0:
+            time.sleep(61)
     
-    # Add columns for calculations
-    add_col = ['volume.std', 
-               'volume', 
-               'last open',
-               'last close',
-               'H/L Delta',
-               'trending %']
-    df[add_col] = ''
+    company_info = company_info.reset_index(drop=True)
+    writer = pd.ExcelWriter('resources/company_overveiw.xlsx', engine='xlsxwriter')
+    company_info.to_excel(writer, sheet_name="Company Overview", index=False, header=True)
+    writer.close()
+
+    return company_info
+
+def get_daily_series(symbol_list, API_KEY):
+
+    # Start the loop for list of symbols
+    for i, symbol in enumerate(symbol_list, start=0):
+        try:
+            # Pull the information
+            url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={API_KEY}'
+            data = requests.get(url).json()
+
+            # Format and make into DataFrame
+            data_df = pd.DataFrame(data['Time Series (5min)']).T
+            stock_df = data_df.apply(pd.to_numeric, errors='ignore')
+            stock_df = stock_df.rename(columns={'1. open':'Open', '2. high':'High', 
+                                '3. low': 'Low','4. close':'Close','5. volume':'Volume'})
+            stock_df.index = pd.to_datetime(stock_df.index)
+
+            # Create daily information
+            daily_stock_df = stock_df.groupby(pd.Grouper(freq='D')).agg({
+                'Open': 'first',
+                'High': 'max',
+                'Low': 'min',
+                'Close': 'last',
+                'Volume': 'sum'
+            })
+
+            stock_df = stock_df.sort_index(ascending=True)
+            stock_df['price_diff'] = stock_df['Close'].diff()
+            stock_df['volatility'] = 0
+            stock_df = stock_df.reset_index(drop=False)
+            for s, row in enumerate(stock_df['Close'], start=0):
+                stock_df.loc[s,'volatility'] = np.std(stock_df.iloc[:s]['Close'].pct_change()) * np.sqrt(s)
+            
+            stock_df['volatility_diff'] = stock_df['volatility'].diff()
+
+            # Make datetime index again
+            stock_df = stock_df.set_index('index')
+
+            # Save the information to an excel file in separate sheets
+            # MUST pip install xlsxwriter if not already installed
+            writer = pd.ExcelWriter(f'resources/stocks_etfs/{symbol}.xlsx', engine='xlsxwriter')
+            stock_df.to_excel(writer, sheet_name='Interval', index=True, header=True)
+            daily_stock_df.to_excel(writer, sheet_name='Daily', index=True, header=True)
+            writer.close()
+
+        except:
+            # print(f"Could not save {symbol}.")
+            # Append error message
+            process_message = f'(get_daily_series) Error with symbol {symbol}: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n'
+            f = open("errors.txt", "a")
+            f.write(process_message)
+            f.close()
+        
+        # Take an API break 30 API calls per minute
+        if i % 29 == 0 and i != 0:
+            time.sleep(61)
 
     # Return DataFrame
-    return df
+    return stock_df, daily_stock_df
+
+def prediction_series(df, p_col, periods):
+    """
+    This function uses the Prophet model to predict future data.  It resamples
+    the data given for a continuous datetime index at 5 minute intervals from
+    date min to date max.  The resampling reindexes the dataframe for the rest
+    of the process.
+    df = DataFrame
+    p_col = Primary Column to use for y
+    periods = periods for make_future_dataframe
+    """
+    # Resample
+    start = df.index.min().floor('D')
+    end = df.index.max().ceil('D')
+    new_index = pd.date_range(start=start, end=end, freq='5T')
+    df = df.reindex(new_index)
+    df = df.fillna(0)
+    
+    # Prepare columns for Prophet
+    df = df.reset_index()[['index', p_col]]
+    df = df.rename(columns={"index":"ds", p_col:"y"})
+    df = df.dropna()
+
+    # Use Prophet to make future dataframe
+    m=Prophet()
+    m.fit(df)
+    future = m.make_future_dataframe(periods=periods, freq="5T")
+    forecast = m.predict(future)
+
+    # Create forecast range using the periods times -1.
+    forecast_range = forecast[['ds','yhat', 'yhat_lower', 'yhat_upper']].iloc[(periods*-1):,:]
+
+    return forecast, forecast_range
