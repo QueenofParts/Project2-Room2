@@ -44,7 +44,7 @@ Our intention is to test its accuracy on other assets or indexes.  Expert Adviso
 
 ### Here are the assets we have chosen to study:
 
-**Nividia**  (NVDA)
+**Nvidia**  (NVDA)
 
 **Apple**  (AAPL)
 
