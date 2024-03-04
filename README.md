@@ -1,90 +1,111 @@
-Project2-Room2
-AI and ML Bootcamp: Project 2 Room 2
-Table of Contents:
+# Project2-Room2
+
+## AI and ML Bootcamp: Project 2 Room 2
+
+## Table of Contents:
+
 Motivation
+
 Focus of Exercise
+
 Installation and Usage:
-	Our Code
+	
+ 	Our Code
+ 
 	Expert Advisor 
 Collaborators
+
 Credits
+
 Websites and other Sources
+
 Original Assignment Instructions and Rubric
 
-Motivation: 
+
+## Motivation: 
 
 Our motivation in this challenge is to take an existing stock analyzing algorithm and see if we could successfully use some specific stocks to test its accuracy.
 We chose to analyze a stock picking algorithm we found in the BGFX community of stock market trading enthusiasts.
 
-The algorithm is called Expert Advisor and was authored by Henry Cheong, a mentor in the BGFX trading community, and Bailey Gravois, CEO of Nova Funding.
+The algorithm is called **Expert Advisor** and was authored by **Henry Cheong**, a mentor in the BGFX trading community, and **Bailey Gravois**, CEO of Nova Funding.
 
 They have graciously permitted us to use Expert Advisor as the subject of our group project.
 
-The focus of this exercise: 
+
+## The focus of this exercise: 
+
 
 Our goal is to determine if the Expert Advisor algorithm is applicable to other assets, besides the US 30 Index, for which it was designed.
 
 
-Methodology:
+## Methodology:
 
 Our intention is to test its accuracy on other assets or indexes.  Expert Advisor is able to be tested on any asset, however, in order to demonstrate its ability to orchestrate buy/sell decisions which will produce a profit, it needs time to do that.  Most stocks or assets do not change quickly enough or frequently enough for us to be able to demonstrate results in the short time frame we have been allotted to do this project.  Therefore, we chose several very volatile assets to test EA on, so we could conduct our analysis of the results during this week.
-Here are the assets we have chosen to study:
-Nividia  (NVDA)
-Apple 	AAPL
-Google  GOOG
-Gold  XAU/USD
-Dow Jones  DOW 
+
+### Here are the assets we have chosen to study:
+
+**Nividia**  (NVDA)
+
+**Apple**  (AAPL)
+
+**Google**  (GOOG)
+
+**Gold**  (XAU/USD)
+
+**Dow Jones**  (DOW) 
 
 
-Installation and Usage: 
+## Installation and Usage: 
 
-•	Our Code: (Analysis of Expert Advisor)
+**Our Code: (Analysis of Expert Advisor)**
+
 1.	This code is to be run on Mac or PC with the following tools installed:
 	
 2.	You must install the following dependencies to run this code:
 	
-i.	pandas as pd
+	i.	pandas as pd
 
-ii.	os
+	ii.	os
 
-iii.	datetime import datetime
+	iii.	datetime import datetime
 
-iv.	time
+	iv.	time
 
-v.	functions import *
+	v.	functions import *
 
-vi.	numpy as np
+	vi.	numpy as np
 
-vii.	matplotlib.pyplot as plt
+	vii.	matplotlib.pyplot as plt
 
-viii.	matplotlib.dates as mdates
+	viii.	matplotlib.dates as mdates
 
-ix.	matplotlib.ticker as ticker
+	ix.	matplotlib.ticker as ticker
 
-x.	matplotlib.colors as mcolors
+	x.	matplotlib.colors as mcolors
 
-xi.	matplotlib.cm as cm
+	xi.	matplotlib.cm as cm
 
-xii.	matplotlib.colors import Normalize
+	xii.	matplotlib.colors import Normalize
 
-xiii.	matplotlib import rcParams
+	xiii.	matplotlib import rcParams
 
-xiv.	Pandas Scikit Learn: KMeans
+	xiv.	Pandas Scikit Learn: KMeans
 
-xv.	Scikit Learn: PCA 
+	xv.	Scikit Learn: PCA 
 
-xvi.	Scikit Learn: StandardScaler
+	xvi.	Scikit Learn: StandardScaler
 
 
-•	Expert Advisor:
+**Expert Advisor:**
+
 1.	Install EA on 1 min chart. 
 2.	Load the set files.
-3.	The timings in set files can be different from your broker, you should run this bot only in High volatility period that is when New York Session opens Start it 5 mins before
+3.	The timings in set files can be different from your broker, you should run this bot only in High volatility period that is when New York Session opens 		Start it 5 mins before
 4.	If volatility is finished, try to run the bot next day. Don't be greedy to pass in one day.
-5.	Run on small lot sizes first before running actual lots, if getting loss then its low volatility, wait till you get profit in small lots then increase lot sizes to actual lot sizes as per the recommendation.
+5.	Run on small lot sizes first before running actual lots, if getting loss then its low volatility, wait till you get profit in small lots then increase lot 	sizes to actual lot sizes as per the recommendation.
 6.	Remember to run the bot on a VPS. VPS location are set based off the prop firm server's location. Ideally you want the latency (ms) to be below 50ms.
 
-Collaborators:
+## Collaborators:
 
 The collaborators for this project are:
 
@@ -96,7 +117,7 @@ The collaborators for this project are:
 
 • Marnie Brannon https://github.com/QueenofParts
 
-Credits and Types of help: 
+## Credits and Types of help: 
 
 Special thanks to Henry Cheong, https://bgfxtradingacademy.teachable.com/
 and Bailey Gravois, https://nova-funding.com/ for allowing us to use their algorithm as the subject of this project.
@@ -112,7 +133,7 @@ Understanding trading terminology and concepts
 
 Websites and other Sources:
 
-###Websites:
+### Websites:
 
 During the work on this this assignment, my collaborators and I used the following websites for reminders of the syntax and structure of certain commands and clarification regarding the specifics of their use as well as stock market and trading concepts:
 
@@ -121,7 +142,7 @@ During the work on this this assignment, my collaborators and I used the followi
 • SciKit Learn -- https://scikit-learn.org/
 • Stack Overflow -- www.stackoverflow.com
 
-Books:
+## Books:
 
 We also referred to the following books for reminders, symtax rules and guidance regarding Python commands:
 
@@ -139,10 +160,10 @@ We also referred to the following books for reminders, symtax rules and guidance
 
 Video Tutorials:
 
-Original Assignment instructions and Rubric:
+# Original Assignment instructions and Rubric:
 
-Project 2 Instructions and Rubric:
-Due: Mar 4 at 11:59pm
+## Project 2 Instructions and Rubric:
+### Due: Mar 4 at 11:59pm
 
 Calendar Bootcamp: OSU-VIRT-AI-PT-10-2023-U-LOLC-MWT
 
@@ -162,13 +183,14 @@ o	Pandas plotting
 o	Prophet
 o	Python
 o	Time series analysis
+
 For this project, you can focus your efforts within a specific industry, as detailed in the following examples.
-Finance
+Finance 
 •	Create an algorithm that analyzes credit scores and predicts consumer personal-loan eligibility.
 •	Using natural language processing, create a chatbot to perform simple tasks and help users find information.
 •	Train an algorithm to analyze consumer spending and predict trends.
 •	Train an image classifier to assess property value, which could then be used to calculate insurance quotes.
-Healthcare
+Healthcare 
 •	Train an algorithm to recognize disease symptoms and predict if a patient is at risk.
 •	Train an image classifier to recognize anomalies, such as suspicious vs healthy areas of skin.
 •	Using natural language processing, create a chatbot that will help connect patients with doctors.
@@ -180,25 +202,45 @@ We’ve only specified healthcare and finance, but any industry can benefit from
 •	Create a visualization that continues to learn where clusters lie based on ML (use Leaflet or Plotly to change the visualization).
 •	Create an idea using mock data, and simulate how machine learning might be used.
 •	Create an analysis of existing data to make a prediction, classification, or regression.
+
 Working with Your Group
+
 When working on an online group project, it’s crucial to meet with your group and communicate regularly. Plan for significant collaboration time outside of class. The following tips can help you make the most of your time:
+
 •	Decide how you’re going to communicate with your group members when you begin. Create a Slack channel, exchange phone numbers, and ensure that the group knows each group member’s available working hours.
-•	Set up an agile project by using GitHub Projects so that your group can track tasks.
-•	Create internal milestones to ensure that your group is on track. Set due dates for these milestones so that you have a timeline for completing the project. Some of these milestones might include:
+
+•	Set up an agile project by using GitHub Projects so that your group can track tasks
+.
+•	Create internal milestones to ensure that your group is on track. Set due dates for these milestones so that you have a timeline for completing the project. 
+
+Some of these milestones might include:
+
 o	Project ideation;
+
 o	Data fetching;
+
 o	Data exploration;
+
 o	Data transformation;
+
 o	Data analysis;
+
 o	Testing;
+
 o	Creating documentation; and
+
 o	Creating the presentation.
+
 Since this is a two-week project, make sure that you have completed at least half of your project by the end of the first week in order to stay on track.
 Although you will divide the work among the group members, it’s essential to collaborate and communicate while working on different parts of the project. Be sure to check in with your teammates regularly and offer support.
-Support and Resources
+
+Support and Resources:
+
 Your instructional team will provide support during classes and office hours. You will also have access to learning assistants and tutors to help you with topics as needed. Make sure to take advantage of these resources as you collaborate with your group on this project.
 Requirements
+
 Data Model Implementation (25 points)
+
 •	There is a Jupyter notebook that thoroughly describes the data extraction, cleaning, and transformation process, and the cleaned data is exported as CSV files for the machine learning model. (10 points)
 •	A Python script initializes, trains, and evaluates a model or loads a pretrained model. (10 points)
 •	The model demonstrates meaningful predictive power at least 75% classification accuracy or 0.80 R-squared. (5 points)
