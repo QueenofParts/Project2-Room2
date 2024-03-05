@@ -119,7 +119,7 @@ The collaborators for this project are:
 
 ## Credits and Types of help: 
 
-Special thanks to Henry, [https://bgfxtradingacademy.teachable.com/](https://t.me/h3nryfxautomatedpassingservice)
+Special thanks to Henry, [Henrys website](https://t.me/h3nryfxautomatedpassingservice)
 and Bailey Gravois, https://nova-funding.com/ for allowing us to use their algorithm as the subject of this project.
 With many thanks to them for time spent, the whole team provided the following help:
 
